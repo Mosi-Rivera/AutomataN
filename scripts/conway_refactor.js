@@ -1,14 +1,19 @@
-const throttle = (func, limit) => {
-    let inThrottle
+const debounce = (func, delay) => {
+
+    let inDebounce
+    
     return function() {
-        const args = arguments
-        const context = this
-        if (!inThrottle) {
-        func.apply(context, args)
-        inThrottle = true
-        setTimeout(() => inThrottle = false, limit)
-        }
+    
+    const context = this
+    
+    const args = arguments
+    
+    clearTimeout(inDebounce)
+    
+    inDebounce = setTimeout(() => func.apply(context, args), delay)
+    
     }
+    
 }
 
 function generateGrid(size)
@@ -60,7 +65,13 @@ class ConwaysPixel
 
         let neighbors = this.neighbors;
         for (let i = neighbors.length; i--;)
-            if (neighbors[i].alive) sum++;
+        {
+            if (neighbors[i].alive)
+            {
+                alive_neighbors.push(neighbors[i]);
+                sum++;
+            }
+        }
 
         if (next_state && (sum < underpopulation || sum > overpopulation))
             next_state = false;
@@ -81,11 +92,18 @@ class ConwaysPixel
     {
         this.alive = !this.alive;
     }
+    reset()
+    {
+        this.alive = false;
+        this.last_state = null;
+        this.next_state = false;
+        this.alive_neighbors = [];
+    }
 }
 class ConwaysGame
 {
     underpopulation = 2;
-    overpopulation = 3;
+    overpopulation = 4;
     reproduction = 3;
     grid_size;
     constructor(grid_size)
@@ -127,6 +145,16 @@ class ConwaysGame
             if (data[i].update()) change_count++;
         return change_count > 0;
     }
+    clear()
+    {
+        let data = this.data;
+        for (let i = data.length; i--;)
+            data[i].reset();
+    }
+    tile_clear()
+    {
+
+    }
     tileDraw(ctx,tile_size)
     {
         let data = this.data;
@@ -148,7 +176,7 @@ class ConwaysGame
     lineDraw(ctx,tile_size,horizontal_color,vertical_color,diagonal_color)
     {
         let tile_size_d2 = tile_size / 2;
-        let data = this.length;
+        let data = this.data;
         ctx.fillStyle = 'white';
         for (let i = data.length; i--;)
         {
@@ -157,12 +185,11 @@ class ConwaysGame
             {
                 for (let j = alive_neighbors.length; j--;)
                 {
-                    let {nx,ny} = alive_neighbors;
+                    let {x: nx,y: ny} = alive_neighbors[j];
                     let dx = x - nx;
                     let dy = y - ny;
-                    if (nx < x || (ny < y && dx != 0)) 
+                    if (nx < x || (ny < y && dx == 0)) 
                         continue;
-
                     if (dx == 0)
                         ctx.strokeStyle = vertical_color;
                     else if (dy == 0)
@@ -172,12 +199,12 @@ class ConwaysGame
 
                     ctx.beginPath();
                     ctx.moveTo(
-                        x * tile_size + tile_size_d2 + dx,
-                        y * tile_size + tile_size_d2 + dy
+                        x * tile_size + tile_size_d2 + dx * -1,
+                        y * tile_size + tile_size_d2 + dy * -1
                     );
                     ctx.lineTo(
-                        nx * tile_size + tile_size_d2 + dx,
-                        ny * tile_size + tile_size_d2 + dy
+                        nx * tile_size + tile_size_d2 + dx * 1,
+                        ny * tile_size + tile_size_d2 + dy * 1
                     );
                     ctx.stroke();
                 }
@@ -188,13 +215,13 @@ class ConwaysGame
 
 class ClientFacing
 {
-    draw_method = 'tile';
+    draw_method = 'line';
     fps = 10;
     raf_index;
     last_tick = 0;
     ctx;
     canvas;
-    size = 20;
+    size = 50;
     data;
     tile_size;
     line_width = 8;
@@ -216,8 +243,46 @@ class ClientFacing
         window.addEventListener('keydown',this.keydown.bind(this));
         window.addEventListener('keyup',this.keyup.bind(this));
         this.canvas.addEventListener('mousedown',this.onclick.bind(this));
-        window.addEventListener('resize',throttle(this.resize.bind(this)));
+        window.addEventListener('resize',debounce(this.resize.bind(this)));
+        let colors = document.getElementsByClassName('directional-color-input');
+        for (let i = colors.length; i--;)
+            colors[i].oninput = this.onColorChange.bind(this,i);
+        document.getElementById('background-color-input').oninput = this.onBackgroundColorChange.bind(this);
+        document.getElementById('reset-colors').onclick = this.resetColors.bind(this);
         this.resize();
+    }
+    setDrawMethod(method)
+    {
+        this.draw_method = method;
+        this.draw();
+    }
+    resetColors()
+    {
+        this.colors = [
+            '#ffffff',
+            '#ffffff',
+            '#ffffff'
+        ];
+        this.background_color = '#000000';
+        this.setBackgroundColor('#000000');
+        this.draw();
+    }
+    setBackgroundColor(color)
+    {
+        this.canvas.style.backgroundColor = color;
+    }
+    setColor(color,i)
+    {
+        this.colors[i] = color;
+        this.draw();
+    }
+    onBackgroundColorChange(e)
+    {
+        this.setBackgroundColor(e.target.value);
+    }
+    onColorChange(i,e)
+    {
+        this.setColor(e.target.value,i);
     }
     setLineWidth(w)
     {
@@ -234,7 +299,8 @@ class ClientFacing
         this.tile_size = tile_size;
         this.setLineWidth(this.line_width);
         this.ctx.imageSmoothingEnabled = false;
-        this.draw();
+        this.clearRect();
+        this.data.tileDraw(this.ctx,this.tile_size);
     }
     onclick(e)
     {
@@ -243,7 +309,8 @@ class ClientFacing
             Math.floor(offsetX / this.tile_size),
             Math.floor(offsetY / this.tile_size)
         );
-        this.draw();
+        this.clearRect();
+        this.data.tileDraw(this.ctx,this.tile_size);
     }
     keydown(e)
     {
@@ -258,9 +325,17 @@ class ClientFacing
         if (e.code == 'Space')
             this.space_down = false;
     }
-    draw()
+    clearGrid()
+    {
+        this.data.clear();
+    }
+    clearRect()
     {
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+    }
+    draw()
+    {
+        this.clearRect();
         this.data[this.draw_method +  'Draw'](this.ctx,this.tile_size,...this.colors);
     }
     update()

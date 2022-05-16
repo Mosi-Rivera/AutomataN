@@ -27,11 +27,10 @@
         </div>
         <div>
             <label for="background-color">Background color</label>
-            <input type="color" name="background-color" id="background-color-change">
+            <input type="color" name="background-color" id="background-color-input">
         </div>
         <div>
-            <label for="hard-color">Set all colors</label>
-            <input type="color" name="hard-color" id="hard-color-change">
+            <button id="reset-colors">Reset Colors</button>
         </div>
         <div>
             <label for="horizontal-color">Vertial color</label>
@@ -49,10 +48,11 @@
             <button onclick="game.sortColorLayers()">Sort Color Layers</button>
         </div>
         <div>
-            <button onclick="game.setMask()">HOODIE MASK</button>
+            <button onclick="game.setDrawMethod('line')">String</button>
         </div>
-        <button onclick="game.forceStringDraw()">String</button>
-        <button onclick="game.normalDraw()">Tile</button>
+        <div>
+            <button onclick="game.setDrawMethod('tile')">Tile</button>
+        </div>
     </div>
     <div id="canvas-container"></div>
     <script src="scripts/conway_refactor.js"></script>
