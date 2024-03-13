@@ -34,7 +34,8 @@
 
 <!-- GETTING STARTED -->
 ## Getting Started
-
+Click on the canvas to draw some pixels. About 8 adjacent pixels should be enough.
+Then press SpaceBar or the toggle play button to start the celular automata magic!
 
 
 <!-- USAGE EXAMPLES -->
