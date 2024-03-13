@@ -1,37 +1,64 @@
 html,
 body
 {
-    color: white;
+    color: #e1e1e1;
+    font-weight: 600;
+    font-family: sans-serif;
     padding: 0px;
     margin: 0px;
     overflow: hidden;
     height: 100vh;
     width: 100vw;
-    background-color: #1A1A1C;
+    background-color: #000000;
 }
 
 #canvas-container
 {
     display: flex;
-    justify-content: center;
 }
 
 canvas
 {
-    background: #1A1A1C;
-    border-right: 1px solid #4E4E50;
-    border-left: 1px solid #4E4E50;
-}
-
-canvas.try-hoodie 
-{
-    -webkit-mask-image: url('assets/hoodie_mask.png');
+    background-color: black;
+    margin: 0 auto;
+    border-right: 1px solid #a1a1a1;
+    border-left: 1px solid #a1a1a1;
 }
 
 #settings
 {
-    position: absolute;
-    top: 0;
-    right: 0;
+    display: flex;
+    justify-content: center;
+    height: 110px;
     z-index: 1000;
+    background: #000;
+    border-bottom: 1px solid #e1e1e1;
+    padding: 1rem;
+}
+
+#settings > div
+{
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+}
+
+#settings > div > div
+{
+    display: flex;
+    justify-content: space-between;
+}
+
+button
+{
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 0px 1rem;
+    height: 108px;
+    border: none;
+    min-width: 100px;
+}
+
+#settings > div > div > button {
+    height: 50px;
 }

@@ -10,48 +10,36 @@
 <body>
     <div id="settings">
         <div>
-            <label for="overpopulation">overpopulation</label>
-            <input type="number" name="overpopulation" id="overpopulation" min="3" max="10" value="4">
+            <div>
+                <label for="background-color">Background</label>
+                <input type="color" name="background-color" id="background-color-input">
+            </div>
+            <div>
+                <label for="horizontal-color">Vertical</label>
+                <input name="horizontal-color" type="color" class="directional-color-input">
+            </div>
+            <div>
+                <label for="horizontal-color">Horizontal</label>
+                <input name="vertical-color" type="color" class="directional-color-input">
+            </div>
+            <div>
+                <label for="horizontal-color">Diagonal</label>
+                <input name="diagonal-color" type="color" class="directional-color-input">
+            </div>
         </div>
         <div>
-            <label for="overpopulation">underpopulation</label>
-            <input type="number" name="underpopulation" id="underpopulation" min="1" max="5" value="2">
+            <div>
+                <button id="reset-colors">Reset Colors</button>
+            </div>
+            <div>
+                <button onclick="game.clearGrid()">Reset</button>
+            </div>
         </div>
         <div>
-            <label for="Grid size">Grid size</label>
-            <input type="number" name="grid-size" id="size-input" min="10" max="80" value="50">
+            <button onclick="game.toggle()">Toggle Play</button>
         </div>
         <div>
-            <label for="line-width">Line width</label>
-            <input type="number" name="line-width" id="line-width" min="1" max="20" value="1">
-        </div>
-        <div>
-            <label for="background-color">Background color</label>
-            <input type="color" name="background-color" id="background-color-input">
-        </div>
-        <div>
-            <button id="reset-colors">Reset Colors</button>
-        </div>
-        <div>
-            <label for="horizontal-color">Vertial color</label>
-            <input name="horizontal-color" type="color" class="directional-color-input">
-        </div>
-        <div>
-            <label for="horizontal-color">Horizontal color</label>
-            <input name="vertical-color" type="color" class="directional-color-input">
-        </div>
-        <div>
-            <label for="horizontal-color">Diagonal color</label>
-            <input name="diagonal-color" type="color" class="directional-color-input">
-        </div>
-        <div>
-            <button onclick="game.sortColorLayers()">Sort Color Layers</button>
-        </div>
-        <div>
-            <button onclick="game.setDrawMethod('line')">String</button>
-        </div>
-        <div>
-            <button onclick="game.setDrawMethod('tile')">Tile</button>
+            <button onclick="alert('Click inside the sqaure and place 8 adjacent pixels.\nThen click the toggle play button or press space bar.\n Enjoy!')">How to use?</button>
         </div>
     </div>
     <div id="canvas-container"></div>

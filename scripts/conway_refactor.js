@@ -15,6 +15,12 @@ const debounce = (func, delay) => {
     }
     
 }
+const default_design = [
+    [false, true, false],
+    [true, false, true],
+    [true, false, true],
+    [true, false, true],
+];
 
 function generateGrid(size)
 {
@@ -150,10 +156,6 @@ class ConwaysGame
         let data = this.data;
         for (let i = data.length; i--;)
             data[i].reset();
-    }
-    tile_clear()
-    {
-
     }
     tileDraw(ctx,tile_size)
     {
@@ -291,8 +293,8 @@ class ClientFacing
     }
     resize()
     {
-        let sx = window.innerWidth / window.innerHeight,
-            sy = window.innerHeight / window.innerWidth;
+        let sx = window.innerWidth / (window.innerHeight - 142),
+            sy = (window.innerHeight - 142) / window.innerWidth;
         let scale = Math.min(sx,sy);
         this.canvas.width = this.canvas.height = window.innerWidth * scale;
         let tile_size = this.canvas.width / this.size;
@@ -328,6 +330,7 @@ class ClientFacing
     clearGrid()
     {
         this.data.clear();
+        this.draw();
     }
     clearRect()
     {
@@ -354,6 +357,7 @@ class ClientFacing
     }
     start()
     {
+        if (this.playing) return;
         console.log('starting');
         this.last_tick = Date.now();
         this.raf_index = requestAnimationFrame(this.update);
@@ -361,10 +365,17 @@ class ClientFacing
     }
     stop()
     {
+        if (!this.playing) return;
         console.log('stopping');
         cancelAnimationFrame(this.raf_index);
         this.raf_index = null;
         this.playing = false;
+    }
+    toggle() {
+        if (this.playing)
+            this.stop();
+        else
+            this.start();
     }
 }
 
